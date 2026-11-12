@@ -53,6 +53,10 @@ export const ReflectionView: React.FC<ReflectionViewProps> = ({
     let cancelled = false;
 
     async function fetchPersonalizedReflection() {
+      if (window.location.hostname.endsWith('github.io')) {
+        if (!cancelled) setIsEnriching(false);
+        return;
+      }
       try {
         const res = await fetch('/api/reflect', {
           method: 'POST',

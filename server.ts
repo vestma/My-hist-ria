@@ -145,7 +145,7 @@ Escreva em português brasileiro elegante, humano e sem clichês motivacionais:
       const baseUrl = rawBaseUrl.replace(/\/+$/, '');
 
       html = html
-        .replace(/content="\/og-cover\.jpg"/g, `content="${baseUrl}/og-cover.jpg"`)
+        .replace(/content="\.?\/og-cover\.jpg"/g, `content="${baseUrl}/og-cover.jpg"`)
         .replace(
           '</head>',
           `  <link rel="canonical" href="${baseUrl}/" />\n    <meta property="og:url" content="${baseUrl}/" />\n  </head>`
