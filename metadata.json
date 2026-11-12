@@ -1,0 +1,6 @@
+{
+  "name": "Travessia — Espelho das Escolhas",
+  "description": "Uma jornada narrativa interativa de autoconhecimento onde as decisões do seu personagem revelam seus valores e perspectivas de vida.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
