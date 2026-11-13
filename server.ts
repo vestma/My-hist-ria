@@ -1,9 +1,9 @@
 import fs from 'fs';
+import http from 'http';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-import { GoogleGenAI, Type } from '@google/genai';
 
 dotenv.config();
 
@@ -32,6 +32,10 @@ async function createServer() {
   const app = express();
   app.use(express.json({ limit: '1mb' }));
 
+  app.get('/api/health', (_req, res) => {
+    res.json({ ok: true });
+  });
+
   app.post('/api/reflect', async (req, res) => {
     const body = req.body as ReflectRequestBody;
 
@@ -47,6 +51,7 @@ async function createServer() {
     }
 
     try {
+      const { GoogleGenAI, Type } = await import('@google/genai');
       const ai = new GoogleGenAI({
         apiKey,
         httpOptions: {
@@ -123,13 +128,26 @@ Escreva em português brasileiro elegante, humano e sem clichês motivacionais:
     }
   });
 
+  const httpServer = http.createServer(app);
+
   if (process.env.NODE_ENV !== 'production') {
     const { createServer: createViteServer } = await import('vite');
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
+    const vitePromise = createViteServer({
+      server: {
+        middlewareMode: true,
+        hmr: process.env.DISABLE_HMR === 'true' ? false : { server: httpServer },
+      },
       appType: 'spa',
     });
-    app.use(vite.middlewares);
+
+    app.use(async (req, res, next) => {
+      try {
+        const vite = await vitePromise;
+        vite.middlewares(req, res, next);
+      } catch (err) {
+        next(err);
+      }
+    });
   } else {
     const distPath = path.resolve(__dirname, 'dist');
     app.use(express.static(distPath, { index: false }));
@@ -156,7 +174,7 @@ Escreva em português brasileiro elegante, humano e sem clichês motivacionais:
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  httpServer.listen(PORT, '0.0.0.0', () => {
     console.log(`Travessia server listening on http://0.0.0.0:${PORT}`);
   });
 }
