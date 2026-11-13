@@ -5,12 +5,14 @@ import {
   Check,
   Copy,
   Download,
+  FileText,
   ImageDown,
   RotateCcw,
   Share2,
 } from 'lucide-react';
 import { computeJourneyAnalysis, REFLECTION_IMAGE } from '../data/storyData';
 import { CharacterProfile, ChoiceRecord, SavedJourney } from '../types/story';
+import { exportJourneyToPdf } from '../utils/pdfExport';
 import {
   buildSharedDiscoveryUrl,
   buildWhatsAppShareUrl,
@@ -245,6 +247,19 @@ export const ReflectionView: React.FC<ReflectionViewProps> = ({
     URL.revokeObjectURL(url);
   };
 
+  const handleDownloadPdf = () => {
+    exportJourneyToPdf({
+      profile,
+      records,
+      archetype: analysis.archetype,
+      sortedValues: analysis.sortedValues,
+      synthesis,
+      blindSpot,
+      guidingQuestion,
+      journalAnswers,
+    });
+  };
+
   const synthesisParagraphs = synthesis
     .split(/\n+/)
     .map((p) => p.trim())
@@ -300,6 +315,15 @@ export const ReflectionView: React.FC<ReflectionViewProps> = ({
                     ? 'Link da descoberta copiado'
                     : 'Compartilhar com amigos'}
                 </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDownloadPdf}
+                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-[#1C1917] bg-white border border-[#D6D3CD] hover:border-[#1C1917] rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0"
+              >
+                <FileText className="w-4 h-4" />
+                <span>Baixar jornada em PDF</span>
               </button>
 
               <button
@@ -562,6 +586,15 @@ export const ReflectionView: React.FC<ReflectionViewProps> = ({
             >
               <BookmarkCheck className="w-4 h-4" />
               <span>{isSaved ? 'Anotações atualizadas no Arquivo' : 'Guardar reflexão no Arquivo'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDownloadPdf}
+              className="inline-flex items-center gap-2 px-5 py-3 text-sm font-medium text-[#1C1917] bg-white border border-[#D6D3CD] hover:border-[#1C1917] rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0"
+            >
+              <FileText className="w-4 h-4" />
+              <span>Gerar PDF completo</span>
             </button>
           </div>
         </div>
